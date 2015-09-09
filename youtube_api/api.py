@@ -24,4 +24,4 @@ def api_call(method, **kwargs):
     try:
         return getattr(youtube, method)().list(**kwargs).execute()
     except HttpError, e:
-        raise YoutubeApiError(e.resp.status, e.content)
+        raise# YoutubeApiError(e.resp.status, e.content)
