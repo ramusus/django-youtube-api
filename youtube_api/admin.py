@@ -11,14 +11,14 @@ class AllFieldsReadOnly(admin.ModelAdmin):
 
 
 class VideoAdmin(AllFieldsReadOnly):
-    pass
-    # def instagram_link(self, obj):
-    #     return u'<a href="%s">%s</a>' % (obj.link, obj.link)
-    #
-    # instagram_link.allow_tags = True
-    #
-    # list_display = ['id', 'user', 'caption', 'created_time', 'instagram_link']
-    # search_fields = ('caption',)
+    def youtube_link(self, obj):
+        return u'<a href="%s">link</a>' % (obj.get_url())
+
+    youtube_link.allow_tags = True
+
+    list_display = ['video_id', 'title', 'youtube_link']
+    list_display_links = ['video_id', 'title',]
+    search_fields = ('title', 'description')
 
 
 admin.site.register(Video, VideoAdmin)

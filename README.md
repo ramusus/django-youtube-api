@@ -1,8 +1,7 @@
 Django youtube API
 ==================
 
-
-[![Build Status](https://travis-ci.org/ramusus/django-youtube-api.png?branch=master)](https://travis-ci.org/ramusus/django-youtube-api) [![Coverage Status](https://coveralls.io/repos/ramusus/django-youtube-api/badge.png?branch=master)](https://coveralls.io/r/ramusus/django-youtube-api)
+[![PyPI version](https://badge.fury.io/py/django-youtube-api.png)](http://badge.fury.io/py/django-youtube-api) [![Build Status](https://travis-ci.org/ramusus/django-youtube-api.png?branch=master)](https://travis-ci.org/ramusus/django-youtube-api) [![Coverage Status](https://coveralls.io/repos/ramusus/django-youtube-api/badge.png?branch=master)](https://coveralls.io/r/ramusus/django-youtube-api)
 
 Application for interacting with youtube API objects using Django model interface
 
@@ -17,6 +16,8 @@ Add into `settings.py` lines:
         ...
         'youtube_api',
     )
+    
+    YOUTUBE_API_ACCESS_KEY = '....'
 
 Usage examples
 --------------
