@@ -5,7 +5,7 @@ from dateutil import parser
 
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
-from django.utils import timezone
+from django.utils import timezone, six
 
 from .api import api_call
 
@@ -161,7 +161,7 @@ class YoutubeModel(models.Model):
             #     value = ','.join([unicode(v) for v in value])
 
             elif isinstance(field, (models.CharField, models.TextField)) and value:
-                if isinstance(value, (str, unicode)):
+                if isinstance(value, six.string_types):
                     value = value.strip()
 
             setattr(self, key, value)

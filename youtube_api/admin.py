@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from models import Video
+
+from .models import Video
 
 
 class AllFieldsReadOnly(admin.ModelAdmin):
