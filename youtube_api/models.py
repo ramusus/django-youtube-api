@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import re
-import dateutil
+from dateutil import parser
 
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
@@ -64,11 +64,11 @@ class YoutubeManager(models.Manager):
         else:
             return self.get_or_create_from_instance(result)
 
-    def get(self, *args, **kwargs):
+    def get(self, method='get', *args, **kwargs):
         """
         Retrieve objects from remote server
         """
-        response = self.api_call('get', *args, **kwargs)
+        response = self.api_call(method, *args, **kwargs)
 
         extra_fields = kwargs.pop('extra_fields', {})
         extra_fields['fetched_at'] = timezone.now()
@@ -139,7 +139,7 @@ class YoutubeModel(models.Model):
             #     pass
             # else:
             if isinstance(field, models.DateTimeField) and value:
-                value = dateutil.parser.parse(value)
+                value = parser.parse(value)
 
             elif isinstance(field, (models.BooleanField)):
                 value = bool(value)
@@ -196,8 +196,7 @@ class VideoManager(YoutubeManager):
         kwargs['part'] = 'snippet'
         kwargs['maxResults'] = max_results
         kwargs['q'] = q
-        response = self.api_call('search', **kwargs)
-        return self.parse_response(response)
+        return self.get('search', **kwargs)
 
 
 class Video(YoutubeBaseModel):
@@ -207,7 +206,7 @@ class Video(YoutubeBaseModel):
     channel_id = models.CharField(max_length=24)
     channel_title = models.CharField(max_length=250)  # denormalization
 
-    category_id = models.PositiveIntegerField()
+    category_id = models.PositiveIntegerField(null=True)
 
     published_at = models.DateTimeField()
 
@@ -245,5 +244,10 @@ class Video(YoutubeBaseModel):
     def parse(self):
         if 'id' in self._resource and 'video_id' not in self._resource:
             self._resource['video_id'] = self._resource.pop('id')
+
+        # {u'kind': u'youtube#video', u'videoId': u'eUdM9vrCbow'} -> u'eUdM9vrCbow'
+        if 'video_id' in self._resource and isinstance(self._resource['video_id'], dict):
+            self._resource['video_id'] = self._resource['video_id']['videoId']
+
         self._resource.update(self._resource.pop('snippet'))
         super(Video, self).parse()

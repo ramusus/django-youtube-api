@@ -30,7 +30,11 @@ class VideoTest(TestCase):
 
         self.assertEqual(len(videos), 50)
         self.assertIsInstance(video, Video)
+        with self.assertRaises(Video.DoesNotExist):
+            Video.objects.get(pk=video.pk)
 
+        video.save()
+        self.assertEqual(video, Video.objects.get(pk=video.pk))
 
 class YoutubeApiTest(VideoTest):
     pass
