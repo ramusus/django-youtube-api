@@ -23,5 +23,5 @@ def api_call(method, **kwargs):
     youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=YOUTUBE_API_ACCESS_KEY)
     try:
         return getattr(youtube, method)().list(**kwargs).execute()
-    except HttpError, e:
+    except HttpError as e:
         raise# YoutubeApiError(e.resp.status, e.content)
