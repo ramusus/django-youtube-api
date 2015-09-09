@@ -1,16 +1,20 @@
-import os
-import sys
-import argparse
-from django.conf import settings
-
 '''
 QuickDjangoTest module for testing in Travis CI https://travis-ci.org
 Changes log:
  * 2014-10-24 updated for compatibility with Django 1.7
  * 2014-11-03 different databases support: sqlite3, mysql, postgres
+ * 2014-12-31 pep8, python 3 compatibility
 '''
 
+import argparse
+import os
+import sys
+
+from django.conf import settings
+
+
 class QuickDjangoTest(object):
+
     """
     A quick way to run the Django test suite without a fully-configured project.
 
@@ -85,11 +89,9 @@ class QuickDjangoTest(object):
 
     def get_custom_settings(self):
         try:
-            from settings_test import *
-            settings_test = dict(locals())
-            del settings_test['self']
-            if 'INSTALLED_APPS' in settings_test:
-                del settings_test['INSTALLED_APPS']
+            import settings_test
+            settings_test = dict([(k, v) for k, v in settings_test.__dict__.items() if k[0] != '_'])
+            INSTALLED_APPS = settings_test.pop('INSTALLED_APPS', [])
         except ImportError:
             settings_test = {}
             INSTALLED_APPS = []
@@ -102,12 +104,12 @@ class QuickDjangoTest(object):
         """
         INSTALLED_APPS, settings_test = self.get_custom_settings()
 
-        settings.configure(DEBUG = True,
-            DATABASE_ENGINE = 'sqlite3',
-            DATABASE_NAME = os.path.join(self.DIRNAME, 'database.db'),
-            INSTALLED_APPS = self.INSTALLED_APPS + INSTALLED_APPS + self.apps,
-            **settings_test
-        )
+        settings.configure(DEBUG=True,
+                           DATABASE_ENGINE='sqlite3',
+                           DATABASE_NAME=os.path.join(self.DIRNAME, 'database.db'),
+                           INSTALLED_APPS=self.INSTALLED_APPS + INSTALLED_APPS + self.apps,
+                           **settings_test
+                           )
         from django.test.simple import run_tests
         failures = run_tests(self.apps, verbosity=1)
         if failures:
@@ -120,9 +122,9 @@ class QuickDjangoTest(object):
         INSTALLED_APPS, settings_test = self.get_custom_settings()
 
         settings.configure(
-            DEBUG = True,
-            DATABASES = self.get_database(),
-            INSTALLED_APPS = self.INSTALLED_APPS + INSTALLED_APPS + self.apps,
+            DEBUG=True,
+            DATABASES=self.get_database(),
+            INSTALLED_APPS=self.INSTALLED_APPS + INSTALLED_APPS + self.apps,
             **settings_test
         )
 
@@ -138,26 +140,18 @@ class QuickDjangoTest(object):
         INSTALLED_APPS, settings_test = self.get_custom_settings()
 
         settings.configure(
-            DEBUG = True,
-            DATABASES = self.get_database(),
-            MIDDLEWARE_CLASSES = ('django.middleware.common.CommonMiddleware',
-                                  'django.middleware.csrf.CsrfViewMiddleware'),
+            DEBUG=True,
+            DATABASES=self.get_database(),
+            MIDDLEWARE_CLASSES=('django.middleware.common.CommonMiddleware',
+                                'django.middleware.csrf.CsrfViewMiddleware'),
             INSTALLED_APPS = self.INSTALLED_APPS + INSTALLED_APPS + self.apps,
             **settings_test
         )
 
-        try:
-            # Django <= 1.8
-            from django.test.simple import DjangoTestSuiteRunner
-            test_runner = DjangoTestSuiteRunner(verbosity=1)
-        except ImportError:
-            # Django >= 1.8
-            from django.test.runner import DiscoverRunner
-            test_runner = DiscoverRunner(verbosity=1)
-
+        from django.test.simple import DjangoTestSuiteRunner
         import django
         django.setup()
-        failures = test_runner.run_tests(self.apps, verbosity=1)
+        failures = DjangoTestSuiteRunner().run_tests(self.apps, verbosity=1)
         if failures:
             sys.exit(failures)
 
