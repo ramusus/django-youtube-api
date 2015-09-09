@@ -9,7 +9,7 @@ env:
   - DJANGO=1.7 DB=postgres
 language: python
 matrix:
-  include:
+  exclude:
     - python: "3.4"
       env: DJANGO=1.4 DB=postgres
 before_script:
