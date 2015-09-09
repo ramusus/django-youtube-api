@@ -15,7 +15,7 @@ setup(
     zip_safe=False,  # because we're including media that Django needs
     install_requires=[
         'google-api-python-client',
-        'dateutil',
+        'python-dateutil',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
