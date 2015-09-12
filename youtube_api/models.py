@@ -189,7 +189,7 @@ class VideoManager(YoutubeManager):
         return super(VideoManager, self).fetch(**kwargs)
 
     def parse_response(self, response, extra_fields=None):
-        response = response['items']
+        response = filter(lambda i: isinstance(i['id'], six.string_types) or i['id']['kind'] == u'youtube#video', response['items'])
         return super(VideoManager, self).parse_response(response, extra_fields)
 
     def search(self, q, max_results=50, **kwargs):
@@ -201,9 +201,9 @@ class VideoManager(YoutubeManager):
 
 class Video(YoutubeBaseModel):
 
-    video_id = models.CharField(max_length=11, primary_key=True)
+    video_id = models.CharField(max_length=11, unique=True)
 
-    channel_id = models.CharField(max_length=24)
+    channel_id = models.CharField(max_length=24) # TODO: make another model
     channel_title = models.CharField(max_length=250)  # denormalization
 
     category_id = models.PositiveIntegerField(null=True)
