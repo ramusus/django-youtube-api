@@ -189,7 +189,8 @@ class VideoManager(YoutubeManager):
         return super(VideoManager, self).fetch(**kwargs)
 
     def parse_response(self, response, extra_fields=None):
-        response = filter(lambda i: isinstance(i['id'], six.string_types) or i['id']['kind'] == u'youtube#video', response['items'])
+        response = list(filter(lambda i: isinstance(i['id'], six.string_types) or i['id']['kind'] == u'youtube#video',
+                               response['items']))
         return super(VideoManager, self).parse_response(response, extra_fields)
 
     def search(self, q, max_results=50, **kwargs):
